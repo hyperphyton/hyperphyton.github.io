@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hyperphyton VR</title>
+  <style>
+    :root {
+      --bg-color: #050507;
+      --card-bg: rgba(18, 18, 24, 0.75);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --card-border-hover: rgba(255, 255, 255, 0.4);
+      --text-main: #f0f0f5;
+      --text-muted: #8e8e9f;
+      --accent-glow: rgba(255, 255, 255, 0.08);
+      --pure-white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      padding: 40px 20px;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 104px;
+      height: 104px;
+      margin-bottom: 20px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .avatar-glow {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 60%, transparent 80%);
+      filter: blur(10px);
+      opacity: 0.8;
+    }
+
+    .avatar-circle {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      background: #000;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--pure-white);
+      margin-bottom: 30px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .links-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .action-card {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      user-select: none;
+    }
+
+    .action-card:hover {
+      border-color: var(--card-border-hover);
+      background: rgba(28, 28, 36, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(255, 255, 255, 0.08);
+    }
+
+    .action-card:active {
+      transform: translateY(0);
+    }
+
+    .action-card.playing {
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(32, 32, 42, 0.95);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.15);
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      gap: 3px;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--pure-white);
+      letter-spacing: 0.3px;
+    }
+
+    .card-subtitle {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #b0b0c0;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .action-card:hover .card-icon {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--pure-white);
+    }
+
+    /* Анимированные полоски эквалайзера */
+    .equalizer-bars {
+      display: none;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+
+    .equalizer-bars.active {
+      display: inline-flex;
+    }
+
+    .equalizer-bars span {
+      width: 2px;
+      background-color: var(--pure-white);
+      border-radius: 1px;
+      animation: soundWave 0.9s ease-in-out infinite alternate;
+    }
+
+    .equalizer-bars span:nth-child(1) { height: 4px; animation-delay: 0.1s; }
+    .equalizer-bars span:nth-child(2) { height: 12px; animation-delay: 0.3s; }
+    .equalizer-bars span:nth-child(3) { height: 7px; animation-delay: 0.2s; }
+
+    @keyframes soundWave {
+      0% { height: 3px; }
+      100% { height: 12px; }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: rgba(18, 18, 22, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--pure-white);
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      opacity: 0;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 6px #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <audio id="audio-player" src="sacred-war-funk.mp3" preload="metadata" loop></audio>
+
+  <main class="container">
+    <div class="avatar-wrapper">
+      <div class="avatar-glow"></div>
+      <div class="avatar-circle">
+        <img id="avatar-img" src="avatar.jpg" alt="hyperphyton avatar">
+      </div>
+    </div>
+
+    <h1 class="profile-title">hyperphyton VR</h1>
+
+    <div class="links-list">
+      <!-- Music Button (SACRED WAR FUNK) -->
+      <button class="action-card" id="music-btn" type="button">
+        <div class="card-info">
+          <div class="card-title-row">
+            <span class="card-title">SACRED WAR FUNK</span>
+            <div class="equalizer-bars" id="eq-bars">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <span class="card-subtitle" id="music-sub">Click to play track</span>
+        </div>
+        <div class="card-icon" id="music-icon-wrap">
+          <svg id="play-svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg id="pause-svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </div>
+      </button>
+
+      <!-- Test Button -->
+      <button class="action-card" id="test-btn" type="button">
+        <div class="card-info">
+          <span class="card-title">Test</span>
+          <span class="card-subtitle">Test action button</span>
+        </div>
+        <div class="card-icon">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </div>
+      </button>
+    </div>
+  </main>
+
+  <div id="toast" class="toast">
+    <div class="toast-dot"></div>
+    <span id="toast-text">Notification</span>
+  </div>
+
+  <script>
+    const audio = document.getElementById('audio-player');
+    const musicBtn = document.getElementById('music-btn');
+    const musicSub = document.getElementById('music-sub');
+    const eqBars = document.getElementById('eq-bars');
+    const playSvg = document.getElementById('play-svg');
+    const pauseSvg = document.getElementById('pause-svg');
+    const testBtn = document.getElementById('test-btn');
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+
+    let toastTimeout;
+    function showToast(message) {
+      clearTimeout(toastTimeout);
+      toastText.textContent = message;
+      toast.classList.add('visible');
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('visible');
+      }, 2500);
+    }
+
+    // Воспроизведение трека
+    musicBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play().then(() => {
+          musicBtn.classList.add('playing');
+          eqBars.classList.add('active');
+          playSvg.style.display = 'none';
+          pauseSvg.style.display = 'block';
+          musicSub.textContent = 'Playing • Loop on';
+          showToast('Playing: SACRED WAR FUNK');
+        }).catch(err => {
+          showToast('Upload "sacred-war-funk.mp3" to repository');
+          console.warn('Audio playback error:', err);
+        });
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('playing');
+        eqBars.classList.remove('active');
+        playSvg.style.display = 'block';
+        pauseSvg.style.display = 'none';
+        musicSub.textContent = 'Paused • Click to resume';
+        showToast('Music paused');
+      }
+    });
+
+    testBtn.addEventListener('click', () => {
+      showToast('Test action triggered');
+    });
+  </script>
+</body>
+</html>
