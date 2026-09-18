@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hyperphyton VR</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #050507;
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient monochromatic soft white top radial spotlight */
+    .ambient-glow {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 550px;
+      height: 480px;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 45%, transparent 70%);
+      filter: blur(50px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle background vignette */
+    .bg-vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 30%, #030304 90%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Circular avatar white neon glow */
+    .avatar-glow {
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.35), 0 0 50px rgba(255, 255, 255, 0.15);
+    }
+
+    /* Text glow */
+    .title-glow {
+      text-shadow: 0 0 22px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.15);
+    }
+
+    /* Black-and-white button styling matching stripes.lol structure */
+    .bw-button {
+      background: #0d0d11;
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bw-button:hover {
+      background: #181820;
+      border-color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 8px 24px rgba(0, 0, 0, 0.9);
+      transform: translateY(-2px);
+    }
+
+    .bw-button:active {
+      transform: translateY(0px) scale(0.99);
+      background: #111116;
+    }
+
+    /* Toast popup animation */
+    @keyframes toastFade {
+      0% { opacity: 0; transform: translate(-50%, 20px); }
+      15% { opacity: 1; transform: translate(-50%, 0); }
+      85% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -10px); }
+    }
+
+    .toast-anim {
+      animation: toastFade 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center min-h-screen text-white select-none">
+
+  <!-- Background lighting layers -->
+  <div class="ambient-glow"></div>
+  <div class="bg-vignette"></div>
+
+  <!-- Main Content Container -->
+  <main class="relative z-10 w-full max-w-xl mx-auto px-5 pt-20 pb-20 flex flex-col items-center">
+
+    <!-- Circular Avatar with Neon White Border -->
+    <div class="relative w-28 h-28 rounded-full border-2 border-white/90 avatar-glow overflow-hidden mb-6 bg-black flex items-center justify-center p-1 group">
+      <!-- 
+        Примечание: аватарка по умолчанию использует вашу черно-белую картинку призрака.
+        Если хотите загрузить свой локальный файл (например avatar.jpg в репозиторий GitHub),
+        просто замените src на 'avatar.jpg'.
+      -->
+      <img 
+        id="avatar-image"
+        src="avatar.jpg" 
+        alt="hyperphyton VR avatar" 
+        class="w-full h-full object-cover rounded-full pointer-events-none transition duration-300 group-hover:scale-105"
+        onerror="this.onerror=null; this.src='https://images.fineartamerica.com/images/artworkimages/medium/3/haunter-ghost-silhouette-glow-black-white.jpg';"
+      />
+    </div>
+
+    <!-- Title / Brand Name -->
+    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-wide text-white mb-9 title-glow text-center">
+      hyperphyton VR
+    </h1>
+
+    <!-- ======================================================== -->
+    <!-- [MUSIC PLAYER PLACEHOLDER]                               -->
+    <!-- Здесь появится ваш плеер с песнями, когда пришлете треки -->
+    <!-- ======================================================== -->
+    <div id="music-player-area" class="w-full"></div>
+
+    <!-- ======================================================== -->
+    <!-- [BUTTONS CONTAINER]                                      -->
+    <!-- ======================================================== -->
+    <div id="buttons-container" class="w-full space-y-4 flex flex-col items-center">
+      
+      <!-- Тестовая черно-белая кнопка -->
+      <button 
+        id="btn-test"
+        type="button" 
+        onclick="triggerButtonAction('Тест')"
+        class="bw-button w-full px-5 py-4 rounded-xl flex items-center justify-between text-left cursor-pointer group"
+      >
+        <div class="flex flex-col">
+          <span class="text-base font-semibold text-white tracking-normal group-hover:text-white transition">
+            Тест
+          </span>
+          <span class="text-xs text-zinc-400 mt-0.5 group-hover:text-zinc-300 transition">
+            Тестовая кнопка / Описание действия
+          </span>
+        </div>
+
+        <!-- Sleek Monochrome Arrow Icon -->
+        <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all duration-200">
+          <svg class="w-4 h-4 text-white group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </button>
+
+      <!-- 
+        ==================================================================
+        Шаблон для добавления новых кнопок (для скачивания файлов или ссылок):
+        Скопируйте этот блок для следующего файла:
+        
+        <a 
+          href="ваш_файл.zip" 
+          download 
+          class="bw-button w-full px-5 py-4 rounded-xl flex items-center justify-between text-left cursor-pointer group no-underline"
+        >
+          <div class="flex flex-col">
+            <span class="text-base font-semibold text-white tracking-normal">Имя Файла</span>
+            <span class="text-xs text-zinc-400 mt-0.5">Размер: 15 MB • Прямое скачивание</span>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all duration-200">
+            <svg class="w-4 h-4 text-white group-hover:text-black" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+          </div>
+        </a>
+        ==================================================================
+      -->
+
+    </div>
+
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none"></div>
+
+  <script>
+    /**
+     * Показывает красивое уведомление без alert()
+     */
+    function triggerButtonAction(name) {
+      showToast(`Кнопка "${name}" успешно нажата!`);
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      
+      const toast = document.createElement('div');
+      toast.className = 'toast-anim px-5 py-3 rounded-xl bg-[#111116] border border-white/40 text-white text-sm font-medium shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md flex items-center space-x-2';
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+        <span>${message}</span>
+      `;
+
+      container.innerHTML = '';
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 2600);
+    }
+  </script>
+
+</body>
+</html>
