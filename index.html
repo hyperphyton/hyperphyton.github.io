@@ -460,6 +460,21 @@
           </svg>
         </div>
       </a>
+
+      <!-- Lightning Launcher Download Button -->
+      <a class="action-card" href="LightningLauncher.apk" download="LightningLauncher.apk" id="launcher-btn">
+        <div class="card-info">
+          <span class="card-title">Lightning Launcher</span>
+          <span class="card-subtitle">App library!</span>
+        </div>
+        <div class="card-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </div>
+      </a>
     </div>
   </main>
 
@@ -491,7 +506,6 @@
       </div>
 
       <div class="player-controls">
-        <!-- Loop Button -->
         <button class="ctrl-btn" id="loop-btn" type="button" title="Loop current track">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="17 1 21 5 17 9"></polyline>
@@ -501,14 +515,12 @@
           </svg>
         </button>
 
-        <!-- Previous Track Button -->
         <button class="ctrl-btn" id="prev-btn" type="button" title="Previous track">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
           </svg>
         </button>
 
-        <!-- Play / Pause Button -->
         <button class="play-pause-btn" id="modal-play-btn" type="button">
           <svg id="m-play-svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
@@ -518,7 +530,6 @@
           </svg>
         </button>
 
-        <!-- Next Track Button -->
         <button class="ctrl-btn" id="next-btn" type="button" title="Next track">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
@@ -679,7 +690,6 @@
       }
     });
 
-    // Drag and drop for modal
     let isDragging = false, startX, startY, initLeft, initTop;
 
     function onDragStart(e) {
@@ -716,7 +726,6 @@
     window.addEventListener('touchmove', onDragMove, { passive: true });
     window.addEventListener('touchend', onDragEnd);
 
-    // Initial setup
     loadTrack(0, false);
   </script>
 </body>
